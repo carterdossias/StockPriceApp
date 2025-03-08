@@ -10,7 +10,7 @@ import base64
 from io import BytesIO
 from datetime import datetime, timedelta
 import yfinance as yf
-
+import tensorflow as tf
 from flask import Flask, request, render_template
 from tensorflow.keras.models import load_model
 
