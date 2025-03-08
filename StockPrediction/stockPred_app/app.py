@@ -187,6 +187,7 @@ def index():
                 steps_ahead = 1  # Safety, though it should be > 0 here
             data_for_forecast = scaler.transform(historical_df[['close']].values)
         else:
+            #Test comment
             # Past date (or on the last known date): 
             # Use only data prior to the target date for backtesting.
             subset_df = historical_df[historical_df['date'] < target_date]
