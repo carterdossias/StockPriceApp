@@ -17,8 +17,8 @@ from tensorflow.keras.models import load_model
 # ========== Configure Your Database ==========
 db_config = {
     'host': '192.168.0.17',
-    'user': 'admin',
-    'password': 'spotify',
+    'user': 'carterdossias',
+    'password': 'dossias1',
     'database': 'stocks'
 }
 
