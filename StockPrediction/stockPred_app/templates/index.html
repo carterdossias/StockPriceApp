@@ -175,6 +175,9 @@
           <span style="color: #27ae60;">${{ "%.2f"|format(actual_price) }}</span>
         </p>
         {% endif %}
+        {% if actual_msg %}
+          <p class="error">{{ actual_msg }}</p>
+        {% endif %}
         <img src="data:image/png;base64,{{ plot_png }}" alt="Stock Price Prediction Plot" />
       </div>
       {% endif %}

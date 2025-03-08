@@ -72,15 +72,6 @@ def iterative_forecast(model, scaler, data, look_back, steps_ahead):
     """
     Predict the closing price 'steps_ahead' days after the last known date
     using iterative, one-day-ahead forecasting.
-    
-    Parameters:
-    - model: the trained LSTM model
-    - scaler: MinMaxScaler (or similar) used to scale the original data
-    - data: scaled closing price data (shape: [n, 1]) from the historical DataFrame
-    - look_back: number of timesteps used by the model for a single prediction
-    - steps_ahead: how many days in the future to predict relative to the last known day
-
-    Returns: predicted closing price (float) for the target day
     """
     # Convert last 'look_back' values to a flat list of floats
     forecast_sequence = data[-look_back:, 0].tolist()
@@ -104,11 +95,15 @@ def get_actual_price_yfinance(ticker, target_date):
     target_str = target_date.strftime('%Y-%m-%d')
     next_day_str = (target_date + timedelta(days=1)).strftime('%Y-%m-%d')
     
-    data = yf.download(ticker, start=target_str, end=next_day_str, progress=False)
+    # Use yfinance's Ticker object for more reliable historical data retrieval
+    ticker_obj = yf.Ticker(ticker)
+    data = ticker_obj.history(start=target_str, end=next_day_str)
     if not data.empty and 'Close' in data.columns:
-        # Take the first row's closing price
-        return float(data['Close'].iloc[0])
+        price = float(data['Close'].iloc[0])
+        print(f"DEBUG: Actual price for {ticker} on {target_str} is {price}")
+        return price
     else:
+        print(f"DEBUG: No actual price data found for {ticker} on {target_str}")
         return None
 
 def create_plot(historical_df, target_date, predicted_price=None, actual_price=None):
@@ -187,8 +182,7 @@ def index():
                 steps_ahead = 1  # Safety, though it should be > 0 here
             data_for_forecast = scaler.transform(historical_df[['close']].values)
         else:
-            #Test comment
-            # Past date (or on the last known date): 
+            # Past date (or on the last known date):
             # Use only data prior to the target date for backtesting.
             subset_df = historical_df[historical_df['date'] < target_date]
             if subset_df.empty:
@@ -202,11 +196,13 @@ def index():
         # Run the iterative forecast using the appropriate data subset and steps_ahead
         predicted_price = iterative_forecast(model, scaler, data_for_forecast, look_back, steps_ahead)
         
-        # If the target date is at most yesterday (i.e., <= yesterday), fetch the actual closing price
-        # This ensures that if the target date is yesterday or before, you'll see the actual closing.
+        # If the target date is before today, attempt to fetch the actual closing price
         actual_price = None
-        if target_date.date() <= (today - timedelta(days=1)).date():
+        actual_msg = None
+        if target_date.date() < today.date():
             actual_price = get_actual_price_yfinance(ticker, target_date)
+            if actual_price is None:
+                actual_msg = "There is no closing price data for the specified day (possible weekend or holiday)."
         
         # Generate the plot. For visualization, we use the full historical data.
         plot_png = create_plot(historical_df, target_date, predicted_price, actual_price)
@@ -217,6 +213,7 @@ def index():
             date_str=date_str,
             predicted_price=predicted_price,
             actual_price=actual_price,
+            actual_msg=actual_msg,
             plot_png=plot_png
         )
     
