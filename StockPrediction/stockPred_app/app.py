@@ -17,9 +17,9 @@ from tensorflow.keras.models import load_model
 # ========== Configure Your Database ==========
 db_config = {
     'host': '192.168.0.17',
-    'user': 'carterdossias',
-    'password': 'dossias1',
-    'database': 'stocks'
+    'user': 'admin',
+    'password': 'spotify',
+    'database': 'Stocks_DB'
 }
 
 app = Flask(__name__)
@@ -146,6 +146,68 @@ def create_plot(historical_df, target_date, predicted_price=None, actual_price=N
     
     return encoded
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+## STOCK VIEW
+@app.route('/stockview', methods=['GET', 'POST'])
+def stock_view():
+    if request.method == 'POST':
+        # Get ticker and days from the form input
+        ticker = request.form.get('ticker', '').upper().strip()
+        days_input = request.form.get('days', '').strip()
+        
+        # Validate ticker input
+        if not ticker:
+            return render_template('stockview.html', error="Please enter a ticker.")
+        
+        # Validate days input (default to 30 if not provided or invalid)
+        try:
+            days = int(days_input)
+            if days <= 0:
+                raise ValueError("Days must be positive.")
+        except Exception:
+            days = 30  # Default value
+
+        # Build the query string so that the ticker is passed in quotes and days as integer.
+        query = f"CALL SelectFromTimeFrame('{ticker}', {days});"
+        
+        try:
+            conn = mysql.connector.connect(**db_config)
+            df = pd.read_sql(query, conn)
+            conn.close()
+        except Exception as e:
+            return render_template('stockview.html', error=f"Error fetching data for {ticker}: {e}")
+        
+        if df.empty:
+            return render_template('stockview.html', error=f"No data available for {ticker} in the last {days} days.")
+        
+        # Ensure the date column is datetime
+        if not pd.api.types.is_datetime64_any_dtype(df['date']):
+            df['date'] = pd.to_datetime(df['date'])
+        
+        # Create a plot (for example, plotting the 'close' price)
+        fig, ax = plt.subplots(figsize=(10, 5))
+        ax.plot(df['date'], df['close'], marker='o', label="Close Price")
+        ax.set_title(f"{ticker} Stock Data (Last {days} Days)")
+        ax.set_xlabel("Date")
+        ax.set_ylabel("Close Price")
+        ax.legend()
+        ax.grid(True)
+        fig.tight_layout()
+        
+        # Encode the plot as a PNG image in base64
+        buf = BytesIO()
+        fig.savefig(buf, format='png')
+        buf.seek(0)
+        plot_png = base64.b64encode(buf.read()).decode('utf-8')
+        plt.close(fig)
+        
+        return render_template('stockview.html', ticker=ticker, plot_png=plot_png, days=days)
+    
+    # GET request: just display the form
+    return render_template('stockview.html')
+# ========== Flask App ==========
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':

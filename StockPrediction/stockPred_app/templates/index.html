@@ -9,7 +9,7 @@
     * {
       box-sizing: border-box;
     }
-    body, h1, p, form {
+    body, h1, p, form, nav {
       margin: 0;
       padding: 0;
     }
@@ -35,6 +35,19 @@
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
+    }
+    nav {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    nav a {
+      text-decoration: none;
+      color: #3498db;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+    nav a:hover {
+      color: #2980b9;
     }
     h1 {
       text-align: center;
@@ -141,6 +154,11 @@
 </head>
 <body>
   <div class="container">
+    <nav>
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/stockview">Stock View</a>
+    </nav>
     <h1>Stock Price Prediction</h1>
     
     {% if error %}
@@ -150,7 +168,7 @@
     <form id="predictForm" method="POST">
       <label for="ticker">Ticker:</label>
       <input type="text" name="ticker" id="ticker" placeholder="e.g., AAPL" required />
-
+      
       <label for="date">Target Date (YYYY-MM-DD):</label>
       <input type="text" name="date" id="date" placeholder="e.g., 2025-03-01" required />
 
