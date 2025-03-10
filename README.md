@@ -65,6 +65,7 @@ We use Python scripts to:
 
 ## ML Model
 **Not Currently Implemented**.  
+Headed by @RishiBokka
 Eventually, we plan to:
 1. Train an LSTM or Transformer-based model that uses both **price history** and **sentiment** features.
 2. Store the model artifacts (e.g., `.h5`, `.pkl`) in the `models/` directory.
