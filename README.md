@@ -1,5 +1,8 @@
 # Stock Price Prediction App
 
+## Main Contributors
+@CarterDossias (Connections / Data Import / Data Prep) @NoahMalewicki (Database Design / Mangament) @RishiBokka (Creating ML Model For Predictions)
+
 This repository contains a full-stack application for predicting stock prices based on:
 1. **Historical stock data** stored in a MySQL database.
 2. **News sentiment analysis** performed on daily articles related to each ticker.
