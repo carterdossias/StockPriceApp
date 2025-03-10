@@ -17,11 +17,27 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
       color: #333;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      position: relative;
       min-height: 100vh;
       padding: 20px;
+    }
+    /* Admin Button at top right */
+    .admin-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+    .admin-button a {
+      text-decoration: none;
+      background: #3498db;
+      color: #fff;
+      padding: 8px 15px;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .admin-button a:hover {
+      background: #2980b9;
     }
     .container {
       background: #fff;
@@ -31,6 +47,7 @@
       border-radius: 10px;
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
       animation: fadeIn 1s ease-in-out;
+      margin: 60px auto 0;  /* Add margin-top so the container doesn't overlap the admin button */
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
@@ -153,6 +170,9 @@
   </style>
 </head>
 <body>
+  <div class="admin-button">
+    <a href="/admin">Admin</a>
+  </div>
   <div class="container">
     <nav>
       <a href="/">Home</a>
